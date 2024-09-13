@@ -1,5 +1,9 @@
+import { useAuthActions } from "@convex-dev/auth/react";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
+import { useState } from "react";
+import { SignInFlow } from "../types";
+
 import {
   Card,
   CardContent,
@@ -8,12 +12,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { useAuthActions } from "@convex-dev/auth/react";
+import { Button } from "@/components/ui/button";
+import { TriangleAlert } from "lucide-react";
 
-import { SignInFlow } from "../types";
-import { useState } from "react";
 interface SignInCardProps {
   setState: (state: SignInFlow) => void;
 }
@@ -22,10 +24,24 @@ export const SignInCard = ({ setState }: SignInCardProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [pending, setPending] = useState(false);
+  const [error, setError] = useState("");
+
+  const onPasswordSignIn = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    setPending(true);
+    signIn("password", { email, password, flow: "signIn" })
+      .catch(() => {
+        setError("Invalid email or password");
+      })
+      .finally(() => {
+        setPending(false);
+      });
+  };
+
   const onProviderSignIn = (value: "github" | "google") => {
     setPending(true);
-    signIn(value)
-    .finally(() => {
+    signIn(value).finally(() => {
       setPending(false);
     });
   };
@@ -37,8 +53,14 @@ export const SignInCard = ({ setState }: SignInCardProps) => {
           Use your email or another service to continue
         </CardDescription>
       </CardHeader>
+      {!!error && (
+        <div className="bg-destructive/15 p-3 rounded-md flex items-center gap-x-2 text-sm text-destructive mb-6">
+          <TriangleAlert className="size-4 " />
+          <p>{error}</p>
+        </div>
+      )}
       <CardContent className="space-y-5 px-0 pb-0">
-        <form className="space-y-2.5">
+        <form onSubmit={onPasswordSignIn} className="space-y-2.5">
           <Input
             disabled={pending}
             value={email}

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { UserButton } from "@/features/auth/components/user-button";
 
 import { useGetWorkspaces } from "@/features/workspaces/api/use-get-workspaces";
-import { useCreateWorkspaceModal } from "@/features/workspaces/store/use-create-workspace";
+import { useCreateWorkspaceModal } from "@/features/workspaces/store/use-create-workspace-modal";
 
 export default function Home() {
   const router = useRouter();
@@ -23,7 +23,7 @@ export default function Home() {
     } else if (!open) {
       setOpen(true);
     }
-  }, [workspaceId, isLoading, open, setOpen,router]);
+  }, [workspaceId, isLoading, open, setOpen, router]);
 
   return (
     <div>
